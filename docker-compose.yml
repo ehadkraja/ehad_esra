@@ -1,0 +1,43 @@
+version: "3"
+services:
+  app:
+    container_name: "app"
+    restart: on-failure
+    build: .
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://user:pass@postgres:5432/db
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    command: npm run dev
+    volumes:
+      - .:/app/
+      - /app/node_modules
+
+  postgres:
+    container_name: "db"
+    image: postgres:11
+    restart: on-failure
+    ports:
+      - "35432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: db
+    volumes:
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql
+
+  pgadmin-compose:
+    container_name: "db_admin"
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "ehadkraja@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "ehadi123!"
+    ports:
+      - "3001:80"
+    depends_on:
+      - postgres
+
